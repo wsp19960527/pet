@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: pet
+          MYSQL_USER: pet
+          MYSQL_PASSWORD: pet
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -u pet -ppet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: mysql://pet:pet@127.0.0.1:3306/pet
+      JWT_SECRET: ci-test-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @pet/shared build
+
+      - run: pnpm --filter @pet/geo build
+
+      - run: pnpm --filter @pet/api prisma:generate
+
+      - run: pnpm --filter @pet/api exec prisma migrate deploy
+
+      - run: pnpm typecheck
+
+      - run: pnpm --filter @pet/api build
+
+      - run: pnpm --filter @pet/admin build
+
+      - run: pnpm --filter @pet/api test
