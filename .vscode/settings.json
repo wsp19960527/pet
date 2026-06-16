@@ -1,0 +1,4 @@
+{
+  "prisma.schema": "apps/api/prisma/schema.prisma",
+  "prisma.env": "apps/api/.env"
+}

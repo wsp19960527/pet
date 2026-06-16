@@ -47,6 +47,8 @@ vendor/
 dist/
 build/
 out/
+apps/api/src/generated/
+apps/api/uploads/
 .next/
 .nuxt/
 .output/

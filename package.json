@@ -1,0 +1,35 @@
+{
+  "name": "pet",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @pet/api dev",
+    "dev:mobile": "pnpm --filter @pet/mobile start",
+    "dev:admin": "pnpm --filter @pet/admin dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:setup": "docker compose up -d && node scripts/wait-for-db.mjs && pnpm prisma:migrate && pnpm --filter @pet/api prisma:seed",
+    "db:setup:local": "node scripts/setup-local-mysql.mjs && node scripts/wait-for-local-db.mjs && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm --filter @pet/api prisma:seed",
+    "db:connect": "mysql -h127.0.0.1 -P3306 -upet -ppet pet",
+    "db:connect:docker": "docker compose exec mysql mysql -upet -ppet pet",
+    "db:studio": "pnpm --filter @pet/api exec prisma studio",
+    "db:status": "pnpm --filter @pet/api exec prisma migrate status",
+    "prisma:generate": "pnpm --filter @pet/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @pet/api prisma:migrate",
+    "prisma:migrate:deploy": "pnpm --filter @pet/api prisma:migrate:deploy"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
+  }
+}
